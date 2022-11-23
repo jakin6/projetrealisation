@@ -141,3 +141,28 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'
+
+auth_classes=[
+    # 'rest_framework.authentication.SessionAuthentication',
+    'api.authentication.TokenAuthentication'
+]
+
+if DEBUG:
+    auth_classes= [
+       'api.authentication.TokenAuthentication' 
+    ]
+
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES":[
+    'rest_framework.authentication.SessionAuthentication',
+    'api.authentication.TokenAuthentication'
+    ],
+    "DEFAULT_PERMISSION_CLASSES":{
+        "rest_framework.permission.IsAuthenticatedOrReadOnly" #GET
+        # 'rest_framework.permissions.IsAuthenticated',
+        # 'rest_framework.permissions.AllowAny',
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    }
+
+}

@@ -32,22 +32,40 @@ from django.db import models
 
 # Pré-approuvé
 # Un paiement pré-approuvé est un paiement pour lequel le client a approuvé le paiement, mais il n'a pas encore été traité. Il sera traité ultérieurement.
-class Livrable(models.Model):
-    libelle=models.CharField(max_length=500)
-    description=models.TextField()
-    createdAt=models.DateField(auto_now_add=True)
 
-    def  __str__(self):
-        return self.libelle
-    
 class Profil(models.Model):
     nom=models.CharField(max_length=200)
     createdAt=models.DateField(auto_now_add=True)
     def  __str__(self):
         return self.nom
 
+class Organisme(models.Model):
+    nom=models.CharField(max_length=200)
+    address=models.CharField(max_length=200)
+    telephone=models.IntegerField(default=1,null=True,blank=True)
+    nom_contact=models.CharField(max_length=200)
+    email=models.EmailField(unique=True,null=True)
+    address_web=models.CharField(max_length=200)
+    createdAt=models.DateField(auto_now_add=True)
+
+    def  __str__(self):
+        return self.nom
+
+class Projet(models.Model):
+    organisme_Client=models.ForeignKey(Organisme,related_name="projet_phase",on_delete=models.CASCADE)
+    nom=models.CharField(max_length=200)
+    description=models.TextField(max_length=5000)
+    date_debut=models.DateField(auto_now_add=True)
+    date_fin=models.DateField(auto_now=True,null=True,blank=True)
+    montant=models.DecimalField(max_digits=20,decimal_places=2)
+    document_tech=models.FileField(upload_to='documents/')
+    createdAt=models.DateField(auto_now_add=True)
+
+    def  __str__(self):
+        return f"{self.organisme_Client.nom}, is working on {self.nom}"
+
 class Phase(models.Model):
-    livrable=models.ForeignKey(Livrable,related_name="livrable_phase",on_delete=models.CASCADE)
+    projet=models.ForeignKey(Projet,related_name="projet_phase",on_delete=models.CASCADE)
     libelle=models.CharField(max_length=500)
     description=models.TextField()
     date_debut=models.DateField(auto_now_add=True)
@@ -64,34 +82,16 @@ class Phase(models.Model):
 
     def  __str__(self):
         return self.libelle
-
-
-class Projet(models.Model):
-    projet=models.ForeignKey(Phase,related_name="projet_phase",on_delete=models.CASCADE)
-    nom=models.CharField(max_length=200)
-    description=models.TextField(max_length=5000)
-    organismeClient=models.CharField(max_length=200)
-    date_debut=models.DateField(auto_now_add=True)
-    date_fin=models.DateField(auto_now=True,null=True,blank=True)
-    montant=models.DecimalField(max_digits=20,decimal_places=2)
-    document_tech=models.FileField(upload_to='documents/')
+class Livrable(models.Model):
+    phase=models.ForeignKey(Phase,related_name="livrable_phase",on_delete=models.CASCADE)
+    libelle=models.FileField(upload_to='documents/')
+    description=models.TextField()
     createdAt=models.DateField(auto_now_add=True)
 
     def  __str__(self):
-        return self.nom
+        return f"{self.phase.libelle}"
 
-class Organisme(models.Model):
-    nom=models.CharField(max_length=200)
-    projet=models.ForeignKey(Projet,related_name="organisme_projet",on_delete=models.CASCADE)
-    address=models.CharField(max_length=200)
-    telephone=models.IntegerField(default=1,null=True,blank=True)
-    nom_contact=models.CharField(max_length=200)
-    email=models.EmailField(unique=True,null=True)
-    address_web=models.CharField(max_length=200)
-    createdAt=models.DateField(auto_now_add=True)
 
-    def  __str__(self):
-        return self.nom
 
 class Employer(models.Model):
     nom=models.CharField(max_length=200)

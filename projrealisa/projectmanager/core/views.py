@@ -3,8 +3,14 @@ from rest_framework import generics
 from xml.dom import ValidationErr
 from .models import *
 from .serializer import *
+from  api.permissions import IsStaffPermission
+from api.authentication  import TokenAuthentication
+from api.mixins import StaffEditorPermissionMixin
+
 # Create your views here.
-class LivrableCreateAPIView(generics.ListCreateAPIView):
+class LivrableCreateAPIView(
+    StaffEditorPermissionMixin,
+    generics.ListCreateAPIView):
     queryset=Livrable.objects.all()
     serializer_class=LivrableSerializers
     
